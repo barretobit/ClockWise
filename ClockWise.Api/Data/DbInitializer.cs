@@ -10,10 +10,12 @@ namespace ClockWise.Api.Data
 
             if (context.Companies.Any()) return;
 
-            var company = new Company 
-            { 
+            var company = new Company
+            {
+                Id = 1,
                 Name = "CrediResolve",
-                PublicShortName = "crvl"            
+                PublicShortName = "crvl",
+                IsEnabled = true
             };
 
             context.Companies.Add(company);
@@ -23,7 +25,8 @@ namespace ClockWise.Api.Data
                 Name = "Mónica Silva",
                 Email = "monica.silva@crediresolve.pt",
                 PasswordHash = "1234",
-                Company = company
+                CompanyId = company.Id,
+                IsEnabled = true
             };
             context.Employees.Add(employee);
 

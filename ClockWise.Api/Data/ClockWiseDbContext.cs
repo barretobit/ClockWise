@@ -3,12 +3,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ClockWise.Api.Data
 {
-    public class ClockWiseDbContext : DbContext
+    public class ClockWiseDbContext(DbContextOptions<ClockWiseDbContext> options) : DbContext(options)
     {
-        public ClockWiseDbContext(DbContextOptions<ClockWiseDbContext> options) : base(options) { }
-
-        public DbSet<Company> Companies { get; set; }
-        public DbSet<Employee> Employees { get; set; }
-        public DbSet<WorkSession> WorkSessions { get; set; }
+        public required DbSet<Company> Companies { get; set; }
+        public required DbSet<Employee> Employees { get; set; }
+        public required DbSet<WorkSession> WorkSessions { get; set; }
     }
 }
