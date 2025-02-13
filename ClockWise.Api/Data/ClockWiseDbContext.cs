@@ -7,6 +7,7 @@ namespace ClockWise.Api.Data
     {
         public required DbSet<Company> Companies { get; set; }
         public required DbSet<Employee> Employees { get; set; }
+        public required DbSet<EmployeeType> EmployeeTypes { get; set; }
         public required DbSet<WorkSession> WorkSessions { get; set; }
     }
 }
