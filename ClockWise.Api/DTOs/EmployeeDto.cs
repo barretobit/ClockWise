@@ -7,6 +7,7 @@
         public string Email { get; set; }
         public string PasswordHash { get; set; }
         public int CompanyId { get; set; }
+        public int EmployeeTypeId { get; set; }
         public bool IsEnabled { get; set; }
     }
 }

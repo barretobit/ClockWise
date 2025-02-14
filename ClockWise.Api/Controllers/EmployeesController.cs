@@ -1,6 +1,6 @@
 ﻿using ClockWise.Api.Data;
-using ClockWise.Api.Models;
 using ClockWise.Api.DTOs;
+using ClockWise.Api.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -33,6 +33,7 @@ namespace ClockWise.Api.Controllers
                 Name = e.Name,
                 Email = e.Email,
                 CompanyId = e.CompanyId,
+                EmployeeTypeId = e.EmployeeTypeId,
                 IsEnabled = e.IsEnabled
             }).ToList();
 
@@ -55,6 +56,7 @@ namespace ClockWise.Api.Controllers
                 Name = employee.Name,
                 Email = employee.Email,
                 CompanyId = employee.CompanyId,
+                EmployeeTypeId = employee.EmployeeTypeId,
                 IsEnabled = employee.IsEnabled
             };
 
@@ -69,6 +71,7 @@ namespace ClockWise.Api.Controllers
                 Name = createEmployeeDto.Name,
                 Email = createEmployeeDto.Email,
                 CompanyId = createEmployeeDto.CompanyId,
+                EmployeeTypeId = createEmployeeDto.EmployeeTypeId,
                 IsEnabled = true,
             };
 
@@ -81,6 +84,7 @@ namespace ClockWise.Api.Controllers
                 Name = employee.Name,
                 Email = employee.Email,
                 CompanyId = employee.CompanyId,
+                EmployeeTypeId = employee.EmployeeTypeId,
                 IsEnabled = employee.IsEnabled,
             };
 
@@ -99,6 +103,7 @@ namespace ClockWise.Api.Controllers
 
             employee.Name = updateEmployeeDto.Name;
             employee.Email = updateEmployeeDto.Email;
+            employee.EmployeeTypeId = updateEmployeeDto.EmployeeTypeId;
             employee.IsEnabled = updateEmployeeDto.IsEnabled;
 
             try

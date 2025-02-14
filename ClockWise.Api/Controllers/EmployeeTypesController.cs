@@ -1,6 +1,6 @@
 ﻿using ClockWise.Api.Data;
-using ClockWise.Api.Models;
 using ClockWise.Api.DTOs;
+using ClockWise.Api.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

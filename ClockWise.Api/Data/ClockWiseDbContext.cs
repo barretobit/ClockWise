@@ -5,9 +5,9 @@ namespace ClockWise.Api.Data
 {
     public class ClockWiseDbContext(DbContextOptions<ClockWiseDbContext> options) : DbContext(options)
     {
-        public required DbSet<Company> Companies { get; set; }
-        public required DbSet<Employee> Employees { get; set; }
-        public required DbSet<EmployeeType> EmployeeTypes { get; set; }
-        public required DbSet<WorkSession> WorkSessions { get; set; }
+        public DbSet<Company> Companies { get; set; }
+        public DbSet<Employee> Employees { get; set; }
+        public DbSet<EmployeeType> EmployeeTypes { get; set; }
+        public DbSet<WorkSession> WorkSessions { get; set; }
     }
 }
