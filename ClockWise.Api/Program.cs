@@ -5,7 +5,6 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddDbContext<ClockWiseDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("ClockWiseConnection")));
 
@@ -25,7 +24,6 @@ builder.Services.AddAuthentication("Bearer")
         };
     });
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
