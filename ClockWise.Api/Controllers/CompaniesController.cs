@@ -1,6 +1,6 @@
-﻿using ClockWise.Api.Data;
-using ClockWise.Api.DTOs;
+﻿using ClockWise.Api.DTOs;
 using ClockWise.Api.Models;
+using ClockWise.Api.Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,17 +10,17 @@ namespace ClockWise.Api.Controllers
     [Route("api/companies")]
     public class CompaniesController : ControllerBase
     {
-        private readonly ClockWiseDbContext _context;
+        private readonly ICompanyRepository _companyRepository;
 
-        public CompaniesController(ClockWiseDbContext context)
+        public CompaniesController(ICompanyRepository companyRepository)
         {
-            _context = context;
+            _companyRepository = companyRepository;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAllCompanies()
         {
-            var companies = await _context.Companies.Where(c => c.IsEnabled == true).ToListAsync();
+            var companies = await _companyRepository.GetAllEnabledCompaniesAsync();
 
             if (companies == null || companies.Count == 0)
             {
@@ -41,7 +41,7 @@ namespace ClockWise.Api.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Company>> GetCompanyById(int id)
         {
-            var company = await _context.Companies.FindAsync(id);
+            var company = await _companyRepository.GetCompanyByIdAsync(id);
 
             if (company == null)
             {
@@ -69,8 +69,7 @@ namespace ClockWise.Api.Controllers
                 IsEnabled = true
             };
 
-            _context.Companies.Add(company);
-            await _context.SaveChangesAsync();
+            await _companyRepository.CreateCompanyAsync(company);
 
             var companyDto = new CompanyDto
             {
@@ -86,7 +85,7 @@ namespace ClockWise.Api.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCompany(int id, CompanyDto updateCompanyDto)
         {
-            var company = await _context.Companies.FindAsync(id);
+            var company = await _companyRepository.GetCompanyByIdAsync(id);
 
             if (company == null)
             {
@@ -99,11 +98,11 @@ namespace ClockWise.Api.Controllers
 
             try
             {
-                await _context.SaveChangesAsync();
+                await _companyRepository.UpdateCompanyAsync(company);
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!CompanyExists(id))
+                if (!await _companyRepository.CompanyExistsAsync(id))
                 {
                     return NotFound();
                 }
@@ -119,36 +118,15 @@ namespace ClockWise.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCompany(int id)
         {
-            var company = await _context.Companies.FindAsync(id);
+            var company = await _companyRepository.GetCompanyByIdAsync(id);
             if (company == null)
             {
                 return NotFound();
             }
 
-            company.IsEnabled = false;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!CompanyExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            await _companyRepository.DeleteCompanyAsync(company);
 
             return NoContent();
-        }
-
-        private bool CompanyExists(int id)
-        {
-            return _context.Companies.Any(e => e.Id == id);
         }
     }
 }
