@@ -1,7 +1,7 @@
 *.tmp
 *.pdb
-ClockWise.Web/bin/
-ClockWise.Web/obj/
 ClockWise.Api/bin/
 ClockWise.Api/obj/
+ClockWise.Api.UnitTests/bin/
+ClockWise.Api.UnitTests/obj/
 .vs/

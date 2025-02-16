@@ -1,6 +1,6 @@
-﻿using ClockWise.Api.Data;
-using ClockWise.Api.DTOs;
+﻿using ClockWise.Api.DTOs;
 using ClockWise.Api.Models;
+using ClockWise.Api.Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,17 +10,17 @@ namespace ClockWise.Api.Controllers
     [Route("api/employeeTypes")]
     public class EmployeeTypesController : ControllerBase
     {
-        private readonly ClockWiseDbContext _context;
+        private readonly IEmployeeTypeRepository _employeeTypeRepository;
 
-        public EmployeeTypesController(ClockWiseDbContext context)
+        public EmployeeTypesController(IEmployeeTypeRepository employeeTypeRepository)
         {
-            _context = context;
+            _employeeTypeRepository = employeeTypeRepository;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<EmployeeTypeDto>>> GetAllEmployeeTypes()
         {
-            var employeeTypes = await _context.EmployeeTypes.Where(e => e.IsEnabled == true).ToListAsync();
+            var employeeTypes = await _employeeTypeRepository.GetAllEnabledEmployeeTypesAsync();
 
             if (employeeTypes == null || employeeTypes.Count == 0)
             {
@@ -41,7 +41,7 @@ namespace ClockWise.Api.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<EmployeeTypeDto>> GetEmployeeType(int id)
         {
-            var employeeType = await _context.EmployeeTypes.FindAsync(id);
+            var employeeType = await _employeeTypeRepository.GetEmployeeTypeByIdAsync(id);
 
             if (employeeType == null)
             {
@@ -69,8 +69,7 @@ namespace ClockWise.Api.Controllers
                 IsEnabled = true,
             };
 
-            _context.EmployeeTypes.Add(employeeType);
-            await _context.SaveChangesAsync();
+            await _employeeTypeRepository.CreateEmployeeTypeAsync(employeeType);
 
             var employeeTypeDto = new EmployeeTypeDto
             {
@@ -86,7 +85,7 @@ namespace ClockWise.Api.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateEmployeeType(int id, EmployeeTypeDto updateEmployeeTypeDto)
         {
-            var employeeType = await _context.EmployeeTypes.FindAsync(id);
+            var employeeType = await _employeeTypeRepository.GetEmployeeTypeByIdAsync(id);
 
             if (employeeType == null)
             {
@@ -98,11 +97,11 @@ namespace ClockWise.Api.Controllers
 
             try
             {
-                await _context.SaveChangesAsync();
+                await _employeeTypeRepository.UpdateEmployeeTypeAsync(employeeType);
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!EmployeeTypeExists(id))
+                if (!await _employeeTypeRepository.EmployeeTypeExistsAsync(id))
                 {
                     return NotFound();
                 }
@@ -118,37 +117,16 @@ namespace ClockWise.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEmployeeType(int id)
         {
-            var employeeType = await _context.EmployeeTypes.FindAsync(id);
+            var employeeType = await _employeeTypeRepository.GetEmployeeTypeByIdAsync(id);
 
             if (employeeType == null)
             {
                 return NotFound();
             }
 
-            employeeType.IsEnabled = false;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!EmployeeTypeExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            await _employeeTypeRepository.DeleteEmployeeTypeAsync(employeeType);
 
             return NoContent();
-        }
-
-        private bool EmployeeTypeExists(int id)
-        {
-            return _context.EmployeeTypes.Any(e => e.Id == id);
         }
     }
 }
