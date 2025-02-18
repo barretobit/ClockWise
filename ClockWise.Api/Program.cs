@@ -1,7 +1,7 @@
 using System.Text;
 using ClockWise.Api.Data;
-using ClockWise.Api.Repositories.Interfaces;
 using ClockWise.Api.Repositories;
+using ClockWise.Api.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -11,6 +11,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<IEmployeeTypeRepository, EmployeeTypeRepository>();
+
+// Register AutoMapper
+builder.Services.AddAutoMapper(typeof(Program));
 
 builder.Services.AddDbContext<ClockWiseDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("ClockWiseConnection")));

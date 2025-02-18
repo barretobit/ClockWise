@@ -1,4 +1,5 @@
-﻿using ClockWise.Api.DTOs;
+﻿using AutoMapper;
+using ClockWise.Api.DTOs;
 using ClockWise.Api.Models;
 using ClockWise.Api.Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -11,10 +12,12 @@ namespace ClockWise.Api.Controllers
     public class CompaniesController : ControllerBase
     {
         private readonly ICompanyRepository _companyRepository;
+        private readonly IMapper _mapper;
 
-        public CompaniesController(ICompanyRepository companyRepository)
+        public CompaniesController(ICompanyRepository companyRepository, IMapper mapper)
         {
             _companyRepository = companyRepository;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -27,13 +30,7 @@ namespace ClockWise.Api.Controllers
                 return NotFound("No Companies found");
             }
 
-            var companyDtos = companies.Select(c => new CompanyDto
-            {
-                Id = c.Id,
-                Name = c.Name,
-                PublicShortName = c.PublicShortName,
-                IsEnabled = c.IsEnabled
-            }).ToList();
+            var companyDtos = _mapper.Map<List<CompanyDto>>(companies);
 
             return Ok(companyDtos);
         }
@@ -48,13 +45,7 @@ namespace ClockWise.Api.Controllers
                 return NotFound("Company not found");
             }
 
-            var companyDto = new CompanyDto
-            {
-                Id = company.Id,
-                Name = company.Name,
-                PublicShortName = company.PublicShortName,
-                IsEnabled = company.IsEnabled
-            };
+            var companyDto = _mapper.Map<CompanyDto>(company);
 
             return Ok(companyDto);
         }
@@ -62,22 +53,12 @@ namespace ClockWise.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateCompany(CompanyDto createCompanyDto)
         {
-            var company = new Company
-            {
-                Name = createCompanyDto.Name,
-                PublicShortName = createCompanyDto.PublicShortName,
-                IsEnabled = true
-            };
+            var company = _mapper.Map<Company>(createCompanyDto);
+            company.IsEnabled = true;
 
             await _companyRepository.CreateCompanyAsync(company);
 
-            var companyDto = new CompanyDto
-            {
-                Id = company.Id,
-                Name = company.Name,
-                PublicShortName = company.PublicShortName,
-                IsEnabled = company.IsEnabled
-            };
+            var companyDto = _mapper.Map<CompanyDto>(company);
 
             return CreatedAtAction(nameof(GetCompanyById), new { id = company.Id }, companyDto);
         }
@@ -92,9 +73,7 @@ namespace ClockWise.Api.Controllers
                 return NotFound();
             }
 
-            company.Name = updateCompanyDto.Name;
-            company.PublicShortName = updateCompanyDto.PublicShortName;
-            company.IsEnabled = updateCompanyDto.IsEnabled;
+            _mapper.Map(updateCompanyDto, company);
 
             try
             {
@@ -119,6 +98,7 @@ namespace ClockWise.Api.Controllers
         public async Task<IActionResult> DeleteCompany(int id)
         {
             var company = await _companyRepository.GetCompanyByIdAsync(id);
+
             if (company == null)
             {
                 return NotFound();

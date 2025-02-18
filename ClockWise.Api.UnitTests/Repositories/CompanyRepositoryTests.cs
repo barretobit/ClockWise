@@ -20,11 +20,11 @@ namespace ClockWise.Api.UnitTests.Repositories
             _repository = new CompanyRepository(_dbContext);
 
             _dbContext.Companies.AddRange(new List<Company>
-        {
-            new Company { Id = 1, Name = "Company A", IsEnabled = true },
-            new Company { Id = 2, Name = "Company B", IsEnabled = false },
-            new Company { Id = 3, Name = "Company C", IsEnabled = true }
-        });
+            {
+                new Company { Id = 1, Name = "Company A", IsEnabled = true },
+                new Company { Id = 2, Name = "Company B", IsEnabled = false },
+                new Company { Id = 3, Name = "Company C", IsEnabled = true }
+            });
             _dbContext.SaveChanges();
         }
 

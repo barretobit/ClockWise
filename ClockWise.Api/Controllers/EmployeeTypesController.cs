@@ -1,4 +1,5 @@
-﻿using ClockWise.Api.DTOs;
+﻿using AutoMapper;
+using ClockWise.Api.DTOs;
 using ClockWise.Api.Models;
 using ClockWise.Api.Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -11,10 +12,12 @@ namespace ClockWise.Api.Controllers
     public class EmployeeTypesController : ControllerBase
     {
         private readonly IEmployeeTypeRepository _employeeTypeRepository;
+        private readonly IMapper _mapper;
 
-        public EmployeeTypesController(IEmployeeTypeRepository employeeTypeRepository)
+        public EmployeeTypesController(IEmployeeTypeRepository employeeTypeRepository, IMapper mapper)
         {
             _employeeTypeRepository = employeeTypeRepository;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -27,13 +30,7 @@ namespace ClockWise.Api.Controllers
                 return NotFound("No employee types found");
             }
 
-            var employeeTypesDtos = employeeTypes.Select(e => new EmployeeTypeDto
-            {
-                Id = e.Id,
-                TypeName = e.TypeName,
-                CompanyId = e.CompanyId,
-                IsEnabled = e.IsEnabled
-            }).ToList();
+            var employeeTypesDtos = _mapper.Map<List<EmployeeTypeDto>>(employeeTypes);
 
             return Ok(employeeTypesDtos);
         }
@@ -48,13 +45,7 @@ namespace ClockWise.Api.Controllers
                 return NotFound("Employee Type not found");
             }
 
-            var employeeTypeDto = new EmployeeTypeDto
-            {
-                Id = employeeType.Id,
-                TypeName = employeeType.TypeName,
-                CompanyId = employeeType.CompanyId,
-                IsEnabled = employeeType.IsEnabled
-            };
+            var employeeTypeDto = _mapper.Map<EmployeeTypeDto>(employeeType);
 
             return Ok(employeeTypeDto);
         }
@@ -62,22 +53,12 @@ namespace ClockWise.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateEmployeeType(EmployeeTypeDto createEmployeeTypeDto)
         {
-            var employeeType = new EmployeeType
-            {
-                TypeName = createEmployeeTypeDto.TypeName,
-                CompanyId = createEmployeeTypeDto.CompanyId,
-                IsEnabled = true,
-            };
+            var employeeType = _mapper.Map<EmployeeType>(createEmployeeTypeDto);
+            employeeType.IsEnabled = true;
 
             await _employeeTypeRepository.CreateEmployeeTypeAsync(employeeType);
 
-            var employeeTypeDto = new EmployeeTypeDto
-            {
-                Id = employeeType.Id,
-                TypeName = employeeType.TypeName,
-                CompanyId = employeeType.CompanyId,
-                IsEnabled = employeeType.IsEnabled,
-            };
+            var employeeTypeDto = _mapper.Map<EmployeeTypeDto>(employeeType);
 
             return CreatedAtAction(nameof(GetEmployeeType), new { id = employeeType.Id }, employeeTypeDto);
         }
@@ -92,8 +73,7 @@ namespace ClockWise.Api.Controllers
                 return NotFound();
             }
 
-            employeeType.TypeName = updateEmployeeTypeDto.TypeName;
-            employeeType.IsEnabled = updateEmployeeTypeDto.IsEnabled;
+            _mapper.Map(updateEmployeeTypeDto, employeeType);
 
             try
             {
