@@ -8,6 +8,6 @@ namespace ClockWise.Api.Data
         public DbSet<Company> Companies { get; set; }
         public DbSet<Employee> Employees { get; set; }
         public DbSet<EmployeeType> EmployeeTypes { get; set; }
-        public DbSet<WorkSession> WorkSessions { get; set; }
+        public DbSet<TickLog> TickLogs { get; set; }
     }
 }

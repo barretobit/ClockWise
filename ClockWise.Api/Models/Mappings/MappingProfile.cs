@@ -10,6 +10,7 @@ namespace ClockWise.Api.Models.Mappings
             CreateMap<CompanyDto, Company>().ReverseMap();
             CreateMap<EmployeeDto, Employee>().ReverseMap();
             CreateMap<EmployeeTypeDto, EmployeeType>().ReverseMap();
+            CreateMap<TickLogDto, TickLog>().ReverseMap();
         }
     }
 }
