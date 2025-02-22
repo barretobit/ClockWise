@@ -4,7 +4,9 @@ namespace ClockWise.Api.Repositories.Interfaces
 {
     public interface ITickLogsInterface
     {
-        Task<List<TickLog>> GetAllTickLogsByEmployeeIdAsync(int employeeId);
+        Task<List<TickLog>> GetTickLogsByEmployeeIdAsync(int employeeId);
+
+        Task<List<TickLog>> GetTickLogsByEmployeeIdWithRangeAsync(int employeeId, DateTime dateFrom, DateTime dateTo);
 
         Task<TickLog> GetTickLogByIdAsync(int id);
 

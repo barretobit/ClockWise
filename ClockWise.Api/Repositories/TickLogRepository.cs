@@ -14,9 +14,16 @@ namespace ClockWise.Api.Repositories
             _context = context;
         }
 
-        public async Task<List<TickLog>> GetAllTickLogsByEmployeeIdAsync(int employeeId)
+        public async Task<List<TickLog>> GetTickLogsByEmployeeIdAsync(int employeeId)
         {
             return await _context.TickLogs.Where(tl => tl.EmployeeId == employeeId).ToListAsync();
+        }
+
+        public async Task<List<TickLog>> GetTickLogsByEmployeeIdWithRangeAsync(int employeeId, DateTime dateFrom, DateTime dateTo)
+        {
+            return await _context.TickLogs
+                .Where(t => t.EmployeeId == employeeId && t.Tick >= dateFrom && t.Tick <= dateTo)
+                .ToListAsync();
         }
 
         public async Task<TickLog> GetTickLogByIdAsync(int id)

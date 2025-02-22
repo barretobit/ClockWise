@@ -21,13 +21,27 @@ namespace ClockWise.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<TickLogDto>>> GetAllTickLogsByEmployeeId(int employeeId)
+        public async Task<ActionResult<IEnumerable<TickLogDto>>> GetTickLogsByEmployeeId(int employeeId)
         {
-            var tickLogs = await _tickLogRepository.GetAllTickLogsByEmployeeIdAsync(employeeId);
+            var tickLogs = await _tickLogRepository.GetTickLogsByEmployeeIdAsync(employeeId);
 
             if (tickLogs == null || tickLogs.Count == 0)
             {
                 return NotFound("No Logs found");
+            }
+
+            var tickLogDtos = _mapper.Map<List<TickLogDto>>(tickLogs);
+            return Ok(tickLogDtos);
+        }
+
+        [HttpGet("filtered")]
+        public async Task<ActionResult<IEnumerable<TickLogDto>>> GetTickLogsByEmployeeIdWithRange(int employeeId, DateTime dateFrom, DateTime dateTo)
+        {
+            var tickLogs = await _tickLogRepository.GetTickLogsByEmployeeIdWithRangeAsync(employeeId, dateFrom, dateTo);
+
+            if (tickLogs == null || tickLogs.Count == 0)
+            {
+                return NotFound("No Logs found in the specified range");
             }
 
             var tickLogDtos = _mapper.Map<List<TickLogDto>>(tickLogs);
