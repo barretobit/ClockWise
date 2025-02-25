@@ -48,6 +48,23 @@ namespace ClockWise.Api.Controllers
             return Ok(tickLogDtos);
         }
 
+        [HttpGet("today")]
+        public async Task<ActionResult<IEnumerable<TickLogDto>>> GetTodayTickLogsByEmployeeId(int employeeId)
+        {
+            DateTime dateFrom = DateTime.Today; // 00:00:00
+            DateTime dateTo = DateTime.Today.AddDays(1).AddTicks(-1); // 23:59:59
+
+            var tickLogs = await _tickLogRepository.GetTickLogsByEmployeeIdWithRangeAsync(employeeId, dateFrom, dateTo);
+
+            if (tickLogs == null || tickLogs.Count == 0)
+            {
+                return NotFound("No Logs found for today");
+            }
+
+            var tickLogDtos = _mapper.Map<List<TickLogDto>>(tickLogs);
+            return Ok(tickLogDtos);
+        }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<TickLogDto>> GetTickLogById(int id)
         {
@@ -66,6 +83,20 @@ namespace ClockWise.Api.Controllers
         public async Task<IActionResult> CreateTickLog(TickLogDto createTickLogDto)
         {
             var tickLog = _mapper.Map<TickLog>(createTickLogDto);
+            tickLog.IsDeleted = false;
+            tickLog.IsApproved = true;
+            tickLog.Tick = DateTime.Now;
+
+            await _tickLogRepository.CreateTickLogAsync(tickLog);
+
+            var tickLogDto = _mapper.Map<TickLogDto>(tickLog);
+            return CreatedAtAction(nameof(GetTickLogById), new { id = tickLog.Id }, tickLogDto);
+        }
+
+        [HttpPost("request")]
+        public async Task<IActionResult> RequestTickLog(TickLogDto requestTickLogDto)
+        {
+            var tickLog = _mapper.Map<TickLog>(requestTickLogDto);
             tickLog.IsDeleted = false;
             tickLog.IsApproved = false;
 
@@ -89,6 +120,37 @@ namespace ClockWise.Api.Controllers
 
             try
             {
+                await _tickLogRepository.UpdateTickLogAsync(tickLog);
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!await _tickLogRepository.TickLogExistsAsync(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        [HttpPut("approve/{id}")]
+        public async Task<IActionResult> ApproveTickLog(int id)
+        {
+            var tickLog = await _tickLogRepository.GetTickLogByIdAsync(id);
+
+            if (tickLog == null)
+            {
+                return NotFound();
+            }
+
+            tickLog.IsApproved = true;
+
+            try
+            {                
                 await _tickLogRepository.UpdateTickLogAsync(tickLog);
             }
             catch (DbUpdateConcurrencyException)

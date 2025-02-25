@@ -68,6 +68,28 @@ namespace ClockWise.Api.Data
             context.Employees.Add(employee1);
             context.Employees.Add(employee2);
             context.SaveChanges();
+
+            var firstEmployee = context.Employees.First();
+
+            var tickLog1 = new TickLog
+            {
+                EmployeeId = firstEmployee.Id,
+                IsApproved = true,
+                IsDeleted = false,
+                Tick = DateTime.Now.AddHours(-4)
+            };
+
+            var tickLog2 = new TickLog
+            {
+                EmployeeId = firstEmployee.Id,
+                IsApproved = true,
+                IsDeleted = false,
+                Tick = DateTime.Now
+            };
+
+            context.TickLogs.Add(tickLog1);
+            context.TickLogs.Add(tickLog2);
+            context.SaveChanges();
         }
     }
 }
