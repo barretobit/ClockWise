@@ -13,6 +13,9 @@ builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<IEmployeeTypeRepository, EmployeeTypeRepository>();
 builder.Services.AddScoped<ITickLogsInterface, TickLogRepository>();
 
+// Logging
+builder.Logging.AddConsole();
+
 // Register AutoMapper
 builder.Services.AddAutoMapper(typeof(Program));
 
