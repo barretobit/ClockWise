@@ -1,5 +1,4 @@
-﻿using System.Net;
-using AutoMapper;
+﻿using AutoMapper;
 using ClockWise.Api.DTOs;
 using ClockWise.Api.Models;
 using ClockWise.Api.Repositories.Interfaces;
@@ -50,57 +49,79 @@ namespace ClockWise.Api.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Company>> GetCompanyById(int id)
         {
-            var company = await _companyRepository.GetCompanyByIdAsync(id);
-
-            if (company == null)
+            try
             {
-                return NotFound("Company not found");
+                var company = await _companyRepository.GetCompanyByIdAsync(id);
+
+                if (company == null)
+                {
+                    return NotFound("Company not found");
+                }
+
+                var companyDto = _mapper.Map<CompanyDto>(company);
+
+                return Ok(companyDto);
             }
-
-            var companyDto = _mapper.Map<CompanyDto>(company);
-
-            return Ok(companyDto);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"An error occurred while retrieving company -> {id}");
+                return StatusCode(500, "Internal Server Error.");
+            }
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateCompany(CompanyDto createCompanyDto)
         {
-            var company = _mapper.Map<Company>(createCompanyDto);
-            company.IsEnabled = true;
+            try
+            {
+                var company = _mapper.Map<Company>(createCompanyDto);
+                company.IsEnabled = true;
 
-            await _companyRepository.CreateCompanyAsync(company);
+                await _companyRepository.CreateCompanyAsync(company);
 
-            var companyDto = _mapper.Map<CompanyDto>(company);
+                var companyDto = _mapper.Map<CompanyDto>(company);
 
-            return CreatedAtAction(nameof(GetCompanyById), new { id = company.Id }, companyDto);
+                return CreatedAtAction(nameof(GetCompanyById), new { id = company.Id }, companyDto);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while creating company.");
+                return StatusCode(500, "Internal Server Error.");
+            }
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCompany(int id, CompanyDto updateCompanyDto)
         {
-            var company = await _companyRepository.GetCompanyByIdAsync(id);
-
-            if (company == null)
-            {
-                return NotFound();
-            }
-
-            _mapper.Map(updateCompanyDto, company);
-
             try
             {
+                var company = await _companyRepository.GetCompanyByIdAsync(id);
+
+                if (company == null)
+                {
+                    return NotFound();
+                }
+
+                _mapper.Map(updateCompanyDto, company);
+
                 await _companyRepository.UpdateCompanyAsync(company);
             }
-            catch (DbUpdateConcurrencyException)
+            catch (DbUpdateConcurrencyException dbException)
             {
                 if (!await _companyRepository.CompanyExistsAsync(id))
                 {
+                    _logger.LogError(dbException, $"An error occurred while updating company -> {updateCompanyDto.Name}");
                     return NotFound();
                 }
                 else
                 {
                     throw;
                 }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"An error occurred while updating company -> {updateCompanyDto.Name}");
+                return StatusCode(500, "Internal Server Error.");
             }
 
             return NoContent();
@@ -109,16 +130,24 @@ namespace ClockWise.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCompany(int id)
         {
-            var company = await _companyRepository.GetCompanyByIdAsync(id);
-
-            if (company == null)
+            try
             {
-                return NotFound();
+                var company = await _companyRepository.GetCompanyByIdAsync(id);
+
+                if (company == null)
+                {
+                    return NotFound();
+                }
+
+                await _companyRepository.DeleteCompanyAsync(company);
+
+                return NoContent();
             }
-
-            await _companyRepository.DeleteCompanyAsync(company);
-
-            return NoContent();
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"An error occurred while deleting company -> {id}");
+                return StatusCode(500, "Internal Server Error.");
+            }
         }
     }
 }

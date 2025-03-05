@@ -5,6 +5,7 @@ using ClockWise.Api.Models;
 using ClockWise.Api.Models.Mappings;
 using ClockWise.Api.Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace ClockWise.Api.UnitTests.Controllers
@@ -12,11 +13,13 @@ namespace ClockWise.Api.UnitTests.Controllers
     public class CompaniesControllerTests
     {
         private readonly IMapper _mapper;
+        private readonly ILogger<CompaniesController> _logger;
 
         public CompaniesControllerTests()
         {
             var config = new MapperConfiguration(cfg => cfg.AddProfile<MappingProfile>());
             _mapper = config.CreateMapper();
+            _logger = new Mock<ILogger<CompaniesController>>().Object;
         }
 
         [Fact]
@@ -32,7 +35,7 @@ namespace ClockWise.Api.UnitTests.Controllers
 
             mockRepository.Setup(repo => repo.GetAllEnabledCompaniesAsync()).ReturnsAsync(companies);
 
-            var controller = new CompaniesController(mockRepository.Object, _mapper);
+            var controller = new CompaniesController(mockRepository.Object, _mapper, _logger);
 
             // Act
             var result = await controller.GetAllCompanies();
@@ -52,7 +55,7 @@ namespace ClockWise.Api.UnitTests.Controllers
             var mockRepository = new Mock<ICompanyRepository>();
             mockRepository.Setup(repo => repo.GetAllEnabledCompaniesAsync()).ReturnsAsync(new List<Company>());
 
-            var controller = new CompaniesController(mockRepository.Object, _mapper);
+            var controller = new CompaniesController(mockRepository.Object, _mapper, _logger);
 
             // Act
             var result = await controller.GetAllCompanies();
@@ -70,7 +73,7 @@ namespace ClockWise.Api.UnitTests.Controllers
             var company = new Company { Id = 1, Name = "Company A", PublicShortName = "compA", IsEnabled = true };
             mockRepository.Setup(repo => repo.GetCompanyByIdAsync(1)).ReturnsAsync(company);
 
-            var controller = new CompaniesController(mockRepository.Object, _mapper);
+            var controller = new CompaniesController(mockRepository.Object, _mapper, _logger);
 
             // Act
             var result = await controller.GetCompanyById(1);
@@ -91,7 +94,7 @@ namespace ClockWise.Api.UnitTests.Controllers
             var mockRepository = new Mock<ICompanyRepository>();
             mockRepository.Setup(repo => repo.GetCompanyByIdAsync(It.IsAny<int>())).ReturnsAsync((Company)null);
 
-            var controller = new CompaniesController(mockRepository.Object, _mapper);
+            var controller = new CompaniesController(mockRepository.Object, _mapper, _logger);
 
             // Act
             var result = await controller.GetCompanyById(1);
@@ -122,7 +125,7 @@ namespace ClockWise.Api.UnitTests.Controllers
 
             mockRepository.Setup(repo => repo.CreateCompanyAsync(It.IsAny<Company>())).Callback<Company>(c => c.Id = 10).Returns(Task.CompletedTask);
 
-            var controller = new CompaniesController(mockRepository.Object, _mapper);
+            var controller = new CompaniesController(mockRepository.Object, _mapper, _logger);
 
             // Act
             var result = await controller.CreateCompany(createCompanyDto);
@@ -148,7 +151,7 @@ namespace ClockWise.Api.UnitTests.Controllers
             mockRepository.Setup(repo => repo.UpdateCompanyAsync(existingCompany)).Returns(Task.CompletedTask);
             mockRepository.Setup(repo => repo.CompanyExistsAsync(1)).ReturnsAsync(true);
 
-            var controller = new CompaniesController(mockRepository.Object, _mapper);
+            var controller = new CompaniesController(mockRepository.Object, _mapper, _logger);
 
             // Act
             var result = await controller.UpdateCompany(1, updateDto);
@@ -164,7 +167,7 @@ namespace ClockWise.Api.UnitTests.Controllers
             var mockRepository = new Mock<ICompanyRepository>();
             mockRepository.Setup(repo => repo.GetCompanyByIdAsync(It.IsAny<int>())).ReturnsAsync((Company)null);
 
-            var controller = new CompaniesController(mockRepository.Object, _mapper);
+            var controller = new CompaniesController(mockRepository.Object, _mapper, _logger);
 
             // Act
             var result = await controller.UpdateCompany(1, new CompanyDto());
@@ -183,7 +186,7 @@ namespace ClockWise.Api.UnitTests.Controllers
             mockRepository.Setup(repo => repo.GetCompanyByIdAsync(1)).ReturnsAsync(existingCompany);
             mockRepository.Setup(repo => repo.DeleteCompanyAsync(existingCompany)).Returns(Task.CompletedTask);
 
-            var controller = new CompaniesController(mockRepository.Object, _mapper);
+            var controller = new CompaniesController(mockRepository.Object, _mapper, _logger);
 
             // Act
             var result = await controller.DeleteCompany(1);
@@ -199,7 +202,7 @@ namespace ClockWise.Api.UnitTests.Controllers
             var mockRepository = new Mock<ICompanyRepository>();
             mockRepository.Setup(repo => repo.GetCompanyByIdAsync(It.IsAny<int>())).ReturnsAsync((Company)null);
 
-            var controller = new CompaniesController(mockRepository.Object, _mapper);
+            var controller = new CompaniesController(mockRepository.Object, _mapper, _logger);
 
             // Act
             var result = await controller.DeleteCompany(1);
