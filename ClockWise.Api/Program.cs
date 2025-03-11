@@ -13,6 +13,15 @@ builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<IEmployeeTypeRepository, EmployeeTypeRepository>();
 builder.Services.AddScoped<ITickLogsInterface, TickLogRepository>();
 
+// Adding VueJs Compatibility
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowVueApp",
+        builder => builder.WithOrigins("http://localhost:8080")
+                          .AllowAnyMethod()
+                          .AllowAnyHeader());
+});
+
 // Logging
 builder.Logging.AddConsole();
 
@@ -55,6 +64,8 @@ using (var scope = app.Services.CreateScope())
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseCors("AllowVueApp");
 
 app.MapControllers();
 
