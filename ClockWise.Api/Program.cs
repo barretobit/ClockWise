@@ -17,7 +17,7 @@ builder.Services.AddScoped<ITickLogsInterface, TickLogRepository>();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowVueApp",
-        builder => builder.WithOrigins("http://localhost:8080")
+        builder => builder.WithOrigins("http://localhost:8080", "https://clockwiseweb.runasp.net")
                           .AllowAnyMethod()
                           .AllowAnyHeader());
 });
