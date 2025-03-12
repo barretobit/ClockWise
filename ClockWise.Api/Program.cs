@@ -16,10 +16,28 @@ builder.Services.AddScoped<ITickLogsInterface, TickLogRepository>();
 // Adding VueJs Compatibility
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowVueApp",
-        builder => builder.WithOrigins("http://localhost:8080", "https://clockwiseweb.runasp.net")
-                          .AllowAnyMethod()
-                          .AllowAnyHeader());
+    options.AddPolicy("AllowLocalhostAndClockWise",
+        builder =>
+        {
+            builder.SetIsOriginAllowed(origin =>
+            {
+                // Allow localhost origins
+                if (origin.StartsWith("http://localhost:") || origin.StartsWith("https://localhost:"))
+                {
+                    return true;
+                }
+
+                // Allow your deployed origin
+                if (origin == "https://clockwiseweb.runasp.net")
+                {
+                    return true;
+                }
+
+                return false; // Deny other origins
+            })
+            .AllowAnyMethod()
+            .AllowAnyHeader();
+        });
 });
 
 // Logging
@@ -65,7 +83,7 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseCors("AllowVueApp");
+app.UseCors("AllowLocalhostAndClockWise");
 
 app.MapControllers();
 

@@ -8,6 +8,8 @@ namespace ClockWise.Api.Repositories.Interfaces
 
         Task<Employee> GetEmployeeByIdAsync(int id);
 
+        Task<List<Employee>> GetEmployeesByCompanyIdAsync(int companyId);
+
         Task CreateEmployeeAsync(Employee employee);
 
         Task UpdateEmployeeAsync(Employee employee);
