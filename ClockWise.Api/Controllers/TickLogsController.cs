@@ -65,6 +65,53 @@ namespace ClockWise.Api.Controllers
             return Ok(tickLogDtos);
         }
 
+        [HttpGet("workedtoday/{employeeId}")]
+        public async Task<ActionResult<TimeSpan>> GetTodayWorkedTimeByEmployeeId(int employeeId)
+        {
+            DateTime dateFrom = DateTime.Today; // 00:00:00
+            DateTime dateTo = DateTime.Today.AddDays(1).AddTicks(-1); // 23:59:59
+
+            var tickLogs = await _tickLogRepository.GetTickLogsByEmployeeIdWithRangeAsync(employeeId, dateFrom, dateTo);
+
+            if (tickLogs == null || tickLogs.Count == 0)
+            {
+                return NotFound("00:00h");
+            }
+
+            TimeSpan totalTimeWorked = TimeSpan.Zero;
+            DateTime? lastTickIn = null; // Keep track of the last "in" time
+
+            foreach (var tickLog in tickLogs.OrderBy(t => t.Tick)) // Order by Tick time
+            {
+                if (lastTickIn == null) 
+                {
+                    lastTickIn = tickLog.Tick;
+                }
+                else 
+                {
+                    if (tickLog.Tick > lastTickIn) 
+                    {
+                        totalTimeWorked += tickLog.Tick - lastTickIn.Value;
+                        lastTickIn = null;
+                    }
+                    else 
+                    {
+                        lastTickIn = tickLog.Tick; 
+                    }
+                }
+            }
+
+            if (lastTickIn != null)
+            {
+                totalTimeWorked += DateTime.Now - lastTickIn.Value;
+            }
+
+            string formattedTime = string.Format("{0:hh\\:mm}h", totalTimeWorked); 
+
+            return Ok(formattedTime);
+        }
+
+
         [HttpGet("{id}")]
         public async Task<ActionResult<TickLogDto>> GetTickLogById(int id)
         {
@@ -150,7 +197,7 @@ namespace ClockWise.Api.Controllers
             tickLog.IsApproved = true;
 
             try
-            {                
+            {
                 await _tickLogRepository.UpdateTickLogAsync(tickLog);
             }
             catch (DbUpdateConcurrencyException)
