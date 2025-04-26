@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace ClockWise.Api.Controllers
 {
     [ApiController]
-    [Route("api/registry")]
+    [Route("api/signup")]
     public class RegistersController : ControllerBase
     {
         private readonly ICompanyRepository _companyRepository;
@@ -41,7 +41,7 @@ namespace ClockWise.Api.Controllers
                 var employee = new Employee
                 {
                     CompanyId = companyDto.Id,
-                    Name = companyDto.Name,
+                    Name = registerDto.Name,
                     Email = registerDto.Email,
                     PasswordHash = registerDto.Password,
                     IsEnabled = true

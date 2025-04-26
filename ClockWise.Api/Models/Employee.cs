@@ -8,6 +8,8 @@
         public string PasswordHash { get; set; }
         public int CompanyId { get; set; }
         public int EmployeeTypeId { get; set; }
+        public DateTime Created { get; set; }
+        public DateTime Updated { get; set; }
         public bool IsEnabled { get; set; } = true;
     }
 }

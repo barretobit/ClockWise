@@ -62,6 +62,20 @@ namespace ClockWise.Api.Controllers
             return Ok(employeeDtos);
         }
 
+        [HttpGet("/byemail/{email}")]
+        public async Task<ActionResult<EmployeeDto>> GetEmployeeByEmail(string email)
+        {
+            Employee employee = await _employeeRepository.GetEmployeeByEmailAsync(email);
+
+            if (employee == null)
+            {
+                return NotFound("Employee not found");
+            }
+
+            var employeeDto = _mapper.Map<List<EmployeeDto>>(employee);
+            return Ok(employeeDto);
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateEmployee(EmployeeDto createEmployeeDto)
         {
