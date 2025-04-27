@@ -12,56 +12,55 @@ namespace ClockWise.Api.Repositories
         public UserRespository(ClockWiseDbContext context)
         {
             _context = context;
-        } 
+        }
 
         public async Task<List<User>> GetAllEnabledUsersAsync()
         {
             return await _context.Users.Where(u => u.IsEnabled == true).ToListAsync();
         }
-        async Task<List<User>> IUserRepository.GetUsersByCompanyIdAsync(int companyId)
+
+        public async Task<List<User>> GetUsersByCompanyIdAsync(int companyId)
         {
             return await _context.Users.Where(u => u.IsEnabled && u.CompanyId == companyId).ToListAsync();
         }
 
-        Task IUserRepository.CreateUserAsync(User user)
+        public async Task<User> GetUserByEmailAsync(string email)
         {
-            throw new NotImplementedException();
+            return await _context.Users.Where(u => u.IsEnabled || u.Email == email).FirstOrDefaultAsync();
         }
 
-        Task IUserRepository.DeleteUserAsync(User user)
+        public async Task<User> GetUserByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            return await _context.Users.Where(u => u.IsEnabled || u.Id == id).FirstOrDefaultAsync();
         }
 
-        Task<List<User>> IUserRepository.GetAllEnabledUsersAsync()
+        public async Task<User> GetUserByUsernameAsync(string username)
         {
-            throw new NotImplementedException();
+            return await _context.Users.Where(u => u.IsEnabled || u.UserName == username).FirstOrDefaultAsync();
         }
 
-        Task<User> IUserRepository.GetUserByEmailAsync(string email)
+        public async Task CreateUserAsync(User user)
         {
-            throw new NotImplementedException();
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
         }
 
-        Task<User> IUserRepository.GetUserByIdAsync(int id)
+        public async Task UpdateUserAsync(User user)
         {
-            throw new NotImplementedException();
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
         }
 
-        Task<User> IUserRepository.GetUserByUsernameAsync(string username)
+        public async Task DeleteUserAsync(User user)
         {
-            throw new NotImplementedException();
+            user.IsEnabled = false;
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
         }
 
-
-        Task IUserRepository.UpdateUserAsync(User user)
+        public async Task<bool> UserExistsAsync(int id)
         {
-            throw new NotImplementedException();
-        }
-
-        Task<bool> IUserRepository.UserExistsAsync(int id)
-        {
-            throw new NotImplementedException();
+            return await _context.Users.AnyAsync(u => u.Id == id);
         }
     }
 }
