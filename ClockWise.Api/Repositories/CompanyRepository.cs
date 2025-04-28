@@ -39,6 +39,7 @@ namespace ClockWise.Api.Repositories
         public async Task DeleteCompanyAsync(Company company)
         {
             company.IsEnabled = false;
+            _context.Companies.Update(company);
             await _context.SaveChangesAsync();
         }
 

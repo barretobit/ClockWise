@@ -46,6 +46,7 @@ namespace ClockWise.Api.Repositories
         public async Task DeleteTickLogAsync(TickLog tickLog)
         {
             tickLog.IsDeleted = true;
+            _context.TickLogs.Update(tickLog);
             await _context.SaveChangesAsync();
         }
 

@@ -49,6 +49,7 @@ namespace ClockWise.Api.Repositories
         public async Task DeleteEmployeeAsync(Employee employee)
         {
             employee.IsEnabled = false;
+            _context.Employees.Update(employee);
             await _context.SaveChangesAsync();
         }
 
