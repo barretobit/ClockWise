@@ -19,6 +19,13 @@ namespace ClockWise.Api.Repositories
             return await _context.Employees.Where(e => e.IsEnabled == true).ToListAsync();
         }
 
+        public async Task<List<Employee>> GetAllDisabledEmployeesAsync()
+        {
+            return await _context.Employees
+                                 .Where(e => !e.IsEnabled)
+                                 .ToListAsync();
+        }
+
         public async Task<Employee> GetEmployeeByIdAsync(int id)
         {
             return await _context.Employees.FindAsync(id);

@@ -5,6 +5,7 @@ namespace ClockWise.Api.Repositories.Interfaces
     public interface IEmployeeRepository
     {
         Task<List<Employee>> GetAllEnabledEmployeesAsync();
+        Task<List<Employee>> GetAllDisabledEmployeesAsync();
 
         Task<Employee> GetEmployeeByIdAsync(int id);
 
@@ -19,5 +20,6 @@ namespace ClockWise.Api.Repositories.Interfaces
         Task DeleteEmployeeAsync(Employee employee);
 
         Task<bool> EmployeeExistsAsync(int id);
+
     }
 }

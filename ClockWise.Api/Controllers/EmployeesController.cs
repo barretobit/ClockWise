@@ -34,6 +34,24 @@ namespace ClockWise.Api.Controllers
             return Ok(employeeDtos);
         }
 
+        /// <summary>
+        /// Retrieves all disabled employees.
+        /// </summary>
+        /// <returns>A list of disabled employee DTOs.</returns>
+        [HttpGet("disabled")]
+        public async Task<ActionResult<IEnumerable<EmployeeDto>>> GetAllDisabledEmployees()
+        {
+            var employees = await _employeeRepository.GetAllDisabledEmployeesAsync();
+
+            if (employees == null || !employees.Any())
+            {
+                return NotFound("No disabled employees found");
+            }
+
+            var employeeDtos = _mapper.Map<List<EmployeeDto>>(employees);
+            return Ok(employeeDtos);
+        }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<EmployeeDto>> GetEmployee(int id)
         {
