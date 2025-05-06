@@ -31,6 +31,14 @@ namespace ClockWise.Api.Repositories
             return await _context.Employees.FindAsync(id);
         }
 
+        public async Task<List<Employee>> SearchEmployeesByNameAsync(string name)
+        {
+            return await _context.Employees
+                                .Where(e => e.IsEnabled && 
+                                            e.Name.Contains(name, StringComparison.CurrentCultureIgnoreCase))
+                                .ToListAsync();
+        }
+
         public async Task<List<Employee>> GetEmployeesByCompanyIdAsync(int companyId)
         {
             return await _context.Employees.Where(e => e.IsEnabled == true && e.CompanyId == companyId).ToListAsync();

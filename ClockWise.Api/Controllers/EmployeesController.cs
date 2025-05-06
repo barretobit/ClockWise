@@ -66,6 +66,30 @@ namespace ClockWise.Api.Controllers
             return Ok(employeeDto);
         }
 
+        /// <summary>
+        /// Searches for employees by a given name (first name, last name, or full name).
+        /// </summary>
+        /// <param name="name">The name to search for.</param>
+        /// <returns>A list of employee DTOs matching the search criteria.</returns>
+        [HttpGet("search")]
+        public async Task<ActionResult<IEnumerable<EmployeeDto>>> SearchEmployeesByName([FromQuery] string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                return BadRequest("Search name cannot be empty.");
+            }
+
+            var employees = await _employeeRepository.SearchEmployeesByNameAsync(name);
+
+            if (employees == null || !employees.Any())
+            {
+                return NotFound($"No employees found matching '{name}'");
+            }
+
+            var employeeDtos = _mapper.Map<List<EmployeeDto>>(employees);
+            return Ok(employeeDtos);
+        }
+
         [HttpGet("company/{companyId}")]
         public async Task<ActionResult<EmployeeDto>> GetEmployeesByCompanyId(int companyId)
         {
