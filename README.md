@@ -76,7 +76,3 @@ Feel free to fork the repository, create a new branch, and submit a pull request
 
 ## License
 This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Contact
-For inquiries, reach out to `barretobit@gmail.com` or visit the [GitHub Issues](https://github.com/barretobit/ClockWise/issues) page.
-
